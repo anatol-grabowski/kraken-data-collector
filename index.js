@@ -1,6 +1,9 @@
 const KrakenWrapper = require('./kraken-wrapper/kraken-api-wrapper')
 const sleep = require('sleep-promise')
 const debug = require('debug')('main')
+const fs = require('fs').promises
+const tinyCmd = require('tiny-cmd')
+const path = require('path')
 
 const key = process.env.KRAKEN_API_KEY
 const secret = process.env.KRAKEN_PRIVATE_KEY
@@ -53,7 +56,7 @@ async function createOrderIfNeeded() {
   console.log('created order', orderDescr)
 }
 
-async function main() {
+async function autoTrade() {
   const intervalSeconds = 1
   let i = 0
   while (true) {
@@ -62,6 +65,23 @@ async function main() {
     await createOrderIfNeeded()
     await sleep(intervalSeconds * 1000)
   }
+}
+
+const pair = 'USDTZUSD'
+async function main() {
+  const {last, bars} = await kraken.getOhlc(pair, 1)
+
+  const filename = path.join(__dirname, 'data', `${pair}.csv`)
+  const cmd = `cd analyzer && pipenv run python update_history.py ${filename}`
+  const proc = tinyCmd.create(cmd)
+  proc.run('')
+  proc.on('stdout', data => {
+    proc.result += data
+  })
+  proc.write(JSON.stringify(bars))
+  proc.spawned.stdin.end()
+  const res = await proc.awaitExit()
+  console.log('result:', res)
 }
 
 main()

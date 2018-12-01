@@ -1,5 +1,6 @@
 const KrakenSafeWrapper = require('kraken-safe-wrapper')
 const info = require('debug')('kraken-wrapper:info')
+const assert = require('assert')
 
 class KrakenWrapper {
   constructor(options) {
@@ -24,6 +25,18 @@ class KrakenWrapper {
   async getBalance() {
     const res = await this.api('Balance')
     return res
+  }
+
+  async getOhlc(pair, interval, since) {
+    const res = await this.api('OHLC', {pair, interval, since})
+    const keys = Object.keys(res).filter(key => key !== 'last')
+    const msg = 'kraken api call OHLC unexpected response format'
+    assert.equal(keys.length, 1, msg)
+    const result = {
+      last: res.last,
+      bars: res[keys[0]],
+    }
+    return result
   }
 
   async createOrder(order) {
