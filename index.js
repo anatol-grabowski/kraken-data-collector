@@ -1,9 +1,16 @@
-const kraken = require('./kraken-api-wrapper')
+const KrakenWrapper = require('./kraken-wrapper/kraken-api-wrapper')
 const sleep = require('sleep-promise')
+const debug = require('debug')('main')
 
 const key = process.env.KRAKEN_API_KEY
 const secret = process.env.KRAKEN_PRIVATE_KEY
-kraken.init(key, secret)
+kraken = new KrakenWrapper({
+  key,
+  secret,
+  maxTries: +Infinity,
+  counterDecIntervalMs: 3000,
+  counterLimit: 10,
+})
 
 async function checkIfShouldCreateOrder() {
   const orders = await kraken.getOpenOrders()
@@ -47,7 +54,7 @@ async function createOrderIfNeeded() {
 }
 
 async function main() {
-  const intervalSeconds = 5
+  const intervalSeconds = 1
   let i = 0
   while (true) {
     i += 1
