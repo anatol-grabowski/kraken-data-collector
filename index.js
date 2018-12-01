@@ -67,10 +67,10 @@ async function autoTrade() {
   }
 }
 
-async function updateHistory(pair) {
+async function updateBars(pair) {
   const {last, bars} = await kraken.getOhlc(pair, 1)
   const filename = path.join(__dirname, 'data', `${pair}.csv`)
-  const cmd = `cd analyzer && pipenv run python update_history.py ${filename}`
+  const cmd = `cd analyzer && pipenv run python update_history.py bars ${filename}`
   const proc = tinyCmd.create(cmd)
   proc.run('')
   proc.on('stdout', data => {
@@ -79,19 +79,50 @@ async function updateHistory(pair) {
   proc.write(JSON.stringify(bars))
   proc.spawned.stdin.end()
   const res = await proc.awaitExit()
-  console.log('result:', res)
+  console.log(path.basename(filename), res.replace(/\n$/g, ''), 'lines')
+}
+
+async function loop(cb, intervalSeconds, repetitions=Infinity) {
+  let i = 0
+  while (i < repetitions) {
+    await cb(i)
+    await sleep(intervalSeconds * 1000)
+  }
+}
+
+async function barsUpdater() {
+  const pairs = ['USDTZUSD', 'XBTUSD', 'ETHXBT']
+  await loop(async () => {
+    console.log(new Date().toString())
+    for (let pair of pairs) await updateBars(pair)
+  }, 10*60)
+}
+
+async function updateDepth(pair) {
+  const depth = await kraken.getMarketDepth(pair)
+  const filename = path.join(__dirname, 'data', `${pair}-depth.csv`)
+  const cmd = `cd analyzer && pipenv run python update_history.py depth ${filename}`
+  const proc = tinyCmd.create(cmd)
+  proc.run('')
+  proc.on('stdout', data => proc.result += data)
+  proc.end(JSON.stringify(depth))
+  const res = await proc.awaitExit()
+  console.log(path.basename(filename), res.replace(/\n$/g, ''), 'bytes')
+}
+
+async function updateBidAsk(pair) {
+  const bidAsk = await kraken.getBidAsk(pair)
+  console.log(bidAsk)
 }
 
 async function main() {
-  const pairs = ['USDTZUSD', 'XBTUSD', 'ETHXBT']
-  const intervalSeconds = 60*10
-  while (true) {
-    console.log(new Date().toString())
-    for (let pair of pairs) {
-      await updateHistory(pair)
-    }
-    await sleep(intervalSeconds * 1000)
-  }
+  // autoTrade()
+  barsUpdater()
+  const pair = 'USDTZUSD'
+  loop(() => updateDepth(pair), 60)
+
+  // await updateBidAsk(pair)
+  // await updateDepth(pair)
 }
 
 main()

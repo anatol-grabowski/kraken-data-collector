@@ -6,14 +6,15 @@
   "dependencies": {
     "debug": "^4.1.0",
     "dotenv": "^6.1.0",
-    "kraken-safe-wrapper": "^1.1.0",
+    "kraken-safe-wrapper": "^1.1.2",
     "sleep-promise": "^8.0.1",
     "tiny-cmd": "^2.0.3"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "DEBUG='*:info,tiny-cmd:started,tiny-cmd:exited' node -r dotenv/config index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node -r dotenv/config index.js",
+    "verbose": "DEBUG='*:info,tiny-cmd:started,tiny-cmd:exited,tiny-cmd:error,tiny-cmd:stderr' npm run start",
+    "quiet": "DEBUG='*:info' npm run start"
   },
   "author": "",
   "license": "ISC"

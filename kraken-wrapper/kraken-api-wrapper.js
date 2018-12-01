@@ -2,6 +2,9 @@ const KrakenSafeWrapper = require('kraken-safe-wrapper')
 const info = require('debug')('kraken-wrapper:info')
 const assert = require('assert')
 
+
+const unexpectedFormatMsg = 'kraken api call OHLC unexpected response format'
+
 class KrakenWrapper {
   constructor(options) {
     this.client = new KrakenSafeWrapper(options)
@@ -30,11 +33,36 @@ class KrakenWrapper {
   async getOhlc(pair, interval, since) {
     const res = await this.api('OHLC', {pair, interval, since})
     const keys = Object.keys(res).filter(key => key !== 'last')
-    const msg = 'kraken api call OHLC unexpected response format'
-    assert.equal(keys.length, 1, msg)
+    assert.equal(keys.length, 1, unexpectedFormatMsg)
     const result = {
       last: res.last,
       bars: res[keys[0]],
+    }
+    return result
+  }
+
+  async getMarketDepth(pair, count) {
+    const res = await this.api('Depth', {pair, count})
+    const keys = Object.keys(res)
+    assert.equal(keys.length, 1, unexpectedFormatMsg)
+    const bids = res[keys[0]].bids
+    const asks = res[keys[0]].asks
+    const time = bids.concat(asks).map(bid => bid[2])
+      .reduce((acc, t) => Math.max(acc, t), -Infinity)
+    const result = {
+      time,
+      ...res[keys[0]],
+    }
+    return result
+  }
+
+  async getBidAsk(pair, since) {
+    const res = await this.api('Spread', {pair, since})
+    const keys = Object.keys(res).filter(key => key !== 'last')
+    assert.equal(keys.length, 1, unexpectedFormatMsg)
+    const result = {
+      last: res.last,
+      prices: res[keys[0]],
     }
     return result
   }
