@@ -11,11 +11,13 @@ class AutoDecCounter {
 
   inc(value) {
     this.counter += value
+    // console.log('inc', this.counter)
     this.startDecTimer()
   }
 
   dec(value) {
     this.counter -= Math.max(value, 0)
+    // console.log('dec', this.counter)
     this.events.emit('dec', this.counter)
   }
 
@@ -23,7 +25,7 @@ class AutoDecCounter {
     if (this.timerRunning) return
     this.timerRunning = true
     while (this.counter > 0) {
-      await sleep(this.timerRunning)
+      await sleep(this.decIntervalMs)
       this.dec(1)
     }
     this.timerRunning = false

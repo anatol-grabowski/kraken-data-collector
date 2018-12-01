@@ -1,12 +1,12 @@
 const KrakenClient = require('kraken-api')
-const sleep = require('sleep-promise')
+const AutoDecCounter = require('./kraken-api-counter')
 
 const krakenWrapper = {
   init(key, secret) {
     this.client = new KrakenClient(key, secret)
     this.maxTries = 100
-    // this.counter = new AutoDecCounter(3100)
-    this.lastRequestTime = undefined
+    this.counter = new AutoDecCounter(3100)
+    this.counterLimit = 10
     this.logLevel = 'debugg'
   },
   log(...args) {
@@ -14,26 +14,11 @@ const krakenWrapper = {
       console.log(...args)
     }
   },
-  getNextSafeCallTime() {
-    if (this.lastRequestTime === undefined) {
-      return Date.now()
-    }
-    const t = this.lastRequestTime + this.counterDecreaseIntervalSeconds * 1000
-    this.log('next safe time', t)
-    return t
-  },
-  async waitSafeCallTime() {
-    const waitTime = this.getNextSafeCallTime() - Date.now()
-    this.log('will wait', waitTime)
-    if (waitTime > 0) {
-      await sleep(waitTime)
-    }
-  },
   async overloadProtectedApiCall(...args) {
     this.log('overload protected api call', args)
-    await this.waitSafeCallTime()
+    await this.counter.waitDropTo(this.counterLimit)
     this.log('done waiting')
-    this.lastRequestTime = Date.now()
+    this.counter.inc(2)
     const result = await this.client.api(...args)
     this.log('got res')
     return result

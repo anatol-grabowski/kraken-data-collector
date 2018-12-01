@@ -47,7 +47,7 @@ async function createOrderIfNeeded() {
 }
 
 async function main() {
-  const intervalSeconds = 60
+  const intervalSeconds = 5
   let i = 0
   while (true) {
     i += 1
