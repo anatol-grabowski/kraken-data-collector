@@ -40,7 +40,6 @@ def main():
     filedir = os.path.dirname(hist_file)
     os.makedirs(filedir, exist_ok=True)
     df.set_index(['time'], inplace=True)
-    print(hist_file)
     print(len(df))
     df.to_csv(hist_file)
 

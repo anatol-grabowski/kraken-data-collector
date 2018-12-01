@@ -67,10 +67,8 @@ async function autoTrade() {
   }
 }
 
-const pair = 'USDTZUSD'
-async function main() {
+async function updateHistory(pair) {
   const {last, bars} = await kraken.getOhlc(pair, 1)
-
   const filename = path.join(__dirname, 'data', `${pair}.csv`)
   const cmd = `cd analyzer && pipenv run python update_history.py ${filename}`
   const proc = tinyCmd.create(cmd)
@@ -82,6 +80,18 @@ async function main() {
   proc.spawned.stdin.end()
   const res = await proc.awaitExit()
   console.log('result:', res)
+}
+
+async function main() {
+  const pairs = ['USDTZUSD', 'XBTUSD', 'ETHXBT']
+  const intervalSeconds = 60*10
+  while (true) {
+    console.log(new Date().toString())
+    for (let pair of pairs) {
+      await updateHistory(pair)
+    }
+    await sleep(intervalSeconds * 1000)
+  }
 }
 
 main()
