@@ -95,7 +95,7 @@ async function barsUpdater() {
   await loop(async () => {
     console.log(new Date().toString())
     for (let pair of pairs) await updateBars(pair)
-  }, 10*60)
+  }, 60*60)
 }
 
 async function updateDepth(pair) {
@@ -119,7 +119,7 @@ async function main() {
   // autoTrade()
   barsUpdater()
   const pair = 'USDTZUSD'
-  loop(() => updateDepth(pair), 60)
+  // loop(() => updateDepth(pair), 60)
 
   // await updateBidAsk(pair)
   // await updateDepth(pair)
