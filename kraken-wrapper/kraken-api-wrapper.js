@@ -1,4 +1,4 @@
-const KrakenSafeWrapper = require('kraken-safe-wrapper')
+const KrakenSafeWrapper = require('./kraken-safe-wrapper')
 const info = require('debug')('kraken-wrapper:info')
 const assert = require('assert')
 
