@@ -6,14 +6,15 @@
   "dependencies": {
     "auto-dec-counter": "^1.1.2",
     "chai": "^4.2.0",
-    "debug": "^4.1.0",
+    "debug": "^4.1.1",
     "dotenv": "^6.2.0",
     "kraken-api": "^1.0.0",
     "sleep-promise": "^8.0.1",
-    "tiny-cmd": "^2.0.3"
+    "tiny-cmd": "^2.1.0"
   },
   "devDependencies": {},
   "scripts": {
+    "notebook": "jupyter notebook",
     "start": "node -r dotenv/config index.js",
     "verbose": "DEBUG='*:info,tiny-cmd:started,tiny-cmd:exited,tiny-cmd:error,tiny-cmd:stderr' npm run start",
     "quiet": "DEBUG='*:info' npm run start"
