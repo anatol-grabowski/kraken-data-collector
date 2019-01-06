@@ -6,6 +6,20 @@ const assert = require('assert')
 const unexpectedFormatMsg = 'kraken api call OHLC unexpected response format'
 
 class KrakenWrapper {
+  static ohlcResponseToObject(arr) {
+    const obj = {
+      timestamp: arr[0],
+      open: arr[1],
+      high: arr[2],
+      low: arr[3],
+      close: arr[4],
+      vwap: arr[5],
+      volume: arr[6],
+      count: arr[7],
+    }
+    return obj
+  }
+
   constructor(options) {
     this.client = new KrakenSafeWrapper(options)
   }

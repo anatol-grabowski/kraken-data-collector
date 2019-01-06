@@ -1,0 +1,22 @@
+{
+  "name": "pairs-to-dynamo-lambda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf dist && mkdir dist && zip --exclude '*dist*' -r dist/lambda.zip .",
+    "upload": "aws lambda update-function-code --function-name 'volumes-to-dynamo' --zip-file fileb://./dist/lambda.zip",
+    "update": "npm run build && npm run upload",
+    "postinstall": "ln -s ../../kraken-wrapper/ ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "auto-dec-counter": "^1.1.2",
+    "aws-sdk": "^2.382.0",
+    "debug": "^4.1.1",
+    "kraken-api": "^1.0.0",
+    "node-binance-api": "^0.8.7"
+  }
+}

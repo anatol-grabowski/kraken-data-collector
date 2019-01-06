@@ -12,8 +12,8 @@ class KrakenSafeWrapper {
   }
 
   async overloadProtectedApiCall(...args) {
-    debug('api call', args)
-    while (this.counter.value > 10) {
+    debug(`api call (counter ${this.counter.value})`, args)
+    while (this.counter.value > this.counterLimit) {
       await this.counter.waitUpdate()
     }
     debug('done waiting', args)
