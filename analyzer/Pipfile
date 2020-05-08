@@ -6,8 +6,15 @@ name = "pypi"
 [packages]
 numpy = "*"
 pandas = "*"
+jupyter = "*"
+matplotlib = "*"
+seaborn = "*"
+mpl-toolkits = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.6"
+python_version = "3"
+
+[scripts]
+notebook = "jupyter notebook"
